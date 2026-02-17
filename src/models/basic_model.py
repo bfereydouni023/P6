@@ -1,6 +1,6 @@
 from models.model import Model
 from tensorflow.keras import Sequential, layers
-from tensorflow.keras.layers.experimental.preprocessing import Rescaling
+from tensorflow.keras.layers import Rescaling
 from tensorflow.keras.optimizers import RMSprop
 
 class BasicModel(Model):
@@ -32,6 +32,7 @@ class BasicModel(Model):
 
             # Flatten + fully-connected head for classification.
             layers.Flatten(),
+            layers.Dropout(0.5),
             layers.Dense(64, activation='relu'),
             layers.Dense(categories_count, activation='softmax')
         ])
