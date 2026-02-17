@@ -1,7 +1,11 @@
 from config import BOARD_SIZE, categories, image_size
-from tensorflow.keras import models
+from tensorflow.keras.models import load_model
 import numpy as np
 import tensorflow as tf
+import cv2
+import os
+import keras
+from matplotlib import pyplot as plt
 
 class TicTacToePlayer:
     def get_move(self, board_state):
@@ -102,13 +106,43 @@ class UserWebcamPlayer:
         # import matplotlib.pyplot as plt
         # plt.imshow(img, cmap='gray', vmin=0, vmax=255)
         # plt.show()
+
+        # Load the model.
+        if not hasattr(self, 'model'):
+            # Relative path to the model file
+            rel_path = 'results/basic_model_15_epochs_timestamp_1771250052.keras'
+            
+            # Convert to absolute path to prevent Keras file handling errors
+            model_path = os.path.abspath(rel_path)
+
+            if os.path.exists(model_path):
+                print(f"Loading model from: {model_path}")
+                try:
+                    self.model = load_model(model_path)
+                except Exception as e:
+                    print(f"FAILED to load model. Error: {e}")
+                    raise e
+            else:
+                raise FileNotFoundError(f"Model file not found at: {model_path}. Make sure you are running from the src directory.")
+        plt.imshow(img, cmap='gray', vmin=0, vmax=255)
+        plt.show()
         #
         # You have to use your saved model, use resized img as input, and get one classification value out of it
         # The classification value should be 0, 1, or 2 for neutral, happy or surprise respectively
+        resize_img = cv2.resize(img, image_size)
 
+        # Formatting the image for the model.
+        if len(resize_img.shape) == 2:
+            resize_img = cv2.cvtColor(resize_img, cv2.COLOR_GRAY2RGB)
+        
+        # Add a dimension at axis 0 to represent the batch size of 1.
+        input_data = np.expand_dims(resize_img, axis = 0)
         # return an integer (0, 1 or 2), otherwise the code will throw an error
-        return 1
-        pass
+
+        # Predict the emotion using the model.
+        prediction = self.model.predict(input_data, verbose = 0)
+        predicted_class = np.argmax(prediction)
+        return int(predicted_class)
     
     def get_move(self, board_state):
         row, col = None, None
