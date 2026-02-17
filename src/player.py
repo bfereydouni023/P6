@@ -110,7 +110,7 @@ class UserWebcamPlayer:
         # Load the model.
         if not hasattr(self, 'model'):
             # Relative path to the model file
-            rel_path = 'results/basic_model_15_epochs_timestamp_1771250052.keras'
+            rel_path = 'results/basic_model_15_epochs_timestamp_1771301641.keras'
             
             # Convert to absolute path to prevent Keras file handling errors
             model_path = os.path.abspath(rel_path)
@@ -124,8 +124,6 @@ class UserWebcamPlayer:
                     raise e
             else:
                 raise FileNotFoundError(f"Model file not found at: {model_path}. Make sure you are running from the src directory.")
-        plt.imshow(img, cmap='gray', vmin=0, vmax=255)
-        plt.show()
         #
         # You have to use your saved model, use resized img as input, and get one classification value out of it
         # The classification value should be 0, 1, or 2 for neutral, happy or surprise respectively
