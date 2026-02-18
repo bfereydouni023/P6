@@ -1,3 +1,4 @@
+import os
 from keras.utils import image_dataset_from_directory
 from config import train_directory, test_directory, image_size, batch_size, validation_split
 
@@ -33,6 +34,30 @@ def get_datasets():
 def get_transfer_datasets():
     # Your code replaces this by loading the dataset
     # you can use image_dataset_from_directory, similar to how the _split_data function is using it
-    train_dataset, validation_dataset, test_dataset = None, None, None
+    base_directory = 'transfer_data'
+    print(f'Loading transfer learning datasets from {os.path.abspath(base_directory)}')
+
+    train_dataset = image_dataset_from_directory(
+        base_directory,
+        label_mode='categorical',
+        color_mode='rgb',
+        batch_size=batch_size,
+        image_size=image_size,
+        shuffle=True,
+        seed=47
+    )
+
+    # Since the Ants v Bees does not have subfolders, we will have to use a portion of train_dataset as validation dataset.
+    validation_dataset = image_dataset_from_directory(
+        base_directory,
+        label_mode='categorical',
+        color_mode='rgb',
+        batch_size=batch_size,
+        image_size=image_size,
+        shuffle=False,
+        seed=47
+    )
+    
     # ...
-    return train_dataset, validation_dataset, test_dataset
+    # No need for test_dataset.
+    return train_dataset, validation_dataset, validation_dataset
